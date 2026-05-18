@@ -46,6 +46,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Puntos: {fileID: 0}
+  mandoIzq: {fileID: 0}
+  fin: 20
+  Uipuntos: {fileID: 0}
+  numerosfinal: {fileID: 0}
+  dosmandos: 1
 --- !u!114 &2770690006471117453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,4 +67,6 @@ MonoBehaviour:
   Bomba: {fileID: 4259239696019502178, guid: a09dc2b54a01be3469cdf540a7466b85, type: 3}
   player: {fileID: 0}
   Distancia: 10
+  bombaPro: 0.3
   AngCubo: 90
+  tiempoSpawn: 4

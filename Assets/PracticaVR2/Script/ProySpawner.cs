@@ -29,7 +29,7 @@ public class ProySpawner : MonoBehaviour
         {
             yield return new WaitForSeconds(tiempoSpawn);
 
-            if (escenaActual.name == "vrsMenu") { Debug.Log("Estamos en menu"); }
+            if (escenaActual.name == "vrsMenu") {  }
             else if (escenaActual.name == "vrsDificil")
             {
                 if (Random.value <= bombaPro) { SpawnBomba(); }

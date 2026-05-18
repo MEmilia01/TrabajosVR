@@ -11,6 +11,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/PracticaVR1/vr.unity
     guid: 14f4ab38aa19ba945ac0a6511dd6a365
+  - enabled: 1
+    path: Assets/PracticaVR2/vrsMenu.unity
+    guid: db1579dc39a12cc46a088ab5422476f7
+  - enabled: 1
+    path: Assets/PracticaVR2/vrsFacil.unity
+    guid: 72f26748012415e419a253919c2cffcf
+  - enabled: 1
+    path: Assets/PracticaVR2/vrsDificil.unity
+    guid: 589878c7acb96f345ae7fa9f4b28936f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 3aa093317d318ea4ab1a643624865700, type: 2}

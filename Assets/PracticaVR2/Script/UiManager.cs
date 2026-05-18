@@ -1,16 +1,15 @@
 using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UiManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] public TextMeshProUGUI Uipuntos;
+    [SerializeField] public Slider numerosfinal;
+    [SerializeField] public bool dosmandos = true;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    void Unmando() { dosmandos = false; }
+    void IrFacil() { SceneManager.LoadScene("vrsFacil"); }
+    void IrDificil() { SceneManager.LoadScene("vrsDificil"); }
 }
