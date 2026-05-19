@@ -8,30 +8,32 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     [SerializeField] private TextMeshProUGUI Puntos;
-    [SerializeField] public GameObject mandoIzq;
+    [SerializeField] private GameObject mandoIzq;
+    [SerializeField] private TextMeshProUGUI Uipuntos;
+    [SerializeField] private Slider numerosfinal;
+    [SerializeField] private bool dosmandos;
+    [SerializeField] private int fin = 20;
+
     private int puntosconseguidos = 0;
-    [SerializeField] private float fin = 20;
-
-    [SerializeField] public TextMeshProUGUI Uipuntos;
-    [SerializeField] public Slider numerosfinal;
-    [SerializeField] public bool dosmandos;
-    Scene escenaActual;
-
-
-    void Start()
-    {    }
-
-    private void Update()
-    {
-        numerosfinal.value = fin;
-        Uipuntos.text = fin.ToString();
-        if(dosmandos == false ) { mandoIzq.SetActive(false); }
-        else { mandoIzq.SetActive(true); }
-    }
+    private Scene escenaActual;
 
     void Awake()
     {
         Instance = this;
+        escenaActual = SceneManager.GetActiveScene();
+    }
+
+    private void Update()
+    {
+        if (numerosfinal != null) numerosfinal.value = puntosconseguidos;
+        if (Uipuntos != null) Uipuntos.text = puntosconseguidos + " / " + fin;
+
+        if (mandoIzq != null) mandoIzq.SetActive(dosmandos);
+    }
+
+    public void SetObjetivo(int nuevoObjetivo)
+    {
+        fin = nuevoObjetivo;
     }
 
     public void Contador()
@@ -41,10 +43,11 @@ public class GameManager : MonoBehaviour
 
         if (puntosconseguidos >= fin)
         {
-            Puntos.text = "¡Has ganadoooo!";
-            FindAnyObjectByType<ProySpawner>().StopSpawning();
+            if (Puntos != null) Puntos.text = "¡Has ganadoooo!";
+
+            var spawner = FindAnyObjectByType<ProySpawner>();
+            if (spawner != null) spawner.StopSpawning();
         }
-        if (escenaActual.name != "vrsMenu") { }
     }
 
     public void Descontador()
@@ -61,7 +64,9 @@ public class GameManager : MonoBehaviour
 
     public void Unmando() { dosmandos = false; }
     public void Dosmando() { dosmandos = true; }
+
     public void IrFacil() { SceneManager.LoadScene("vrsFacil"); }
     public void IrDificil() { SceneManager.LoadScene("vrsDificil"); }
+
     public bool MetaAlcanzada() => puntosconseguidos >= fin;
 }
