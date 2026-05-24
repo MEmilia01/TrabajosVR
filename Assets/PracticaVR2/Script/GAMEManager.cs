@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEditor.Experimental.GraphView;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,17 +14,18 @@ public class GameManager : MonoBehaviour
 
     [Header("Configuración")]
     [SerializeField] private int objetivoPuntos = 20;
-    [SerializeField] private bool dosMandos = true;
+    [SerializeField] public bool dosMandos = true;
 
     private int puntosActuales = 0;
     private ProySpawner spawner;
+    private MenuManager Ui;
 
     public int ObjetivoPuntos => objetivoPuntos;
     public int PuntosActuales => puntosActuales;
-    public bool DosMandos => dosMandos;
 
     private void Awake()
     {
+
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -36,14 +38,13 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        BuscarSpawner();
+        BuscarSpawneryUi();
         ActualizarUI();
     }
 
     private void Update()
     {
-        if (mandoIzquierdo != null)
-            mandoIzquierdo.SetActive(!dosMandos);
+        Ui.AplicarConfiguracion();
     }
 
     public void SetObjetivo(int nuevoObjetivo)
@@ -54,12 +55,13 @@ public class GameManager : MonoBehaviour
 
     public void Unmando()
     {
-        dosMandos = false;
+
+        mandoIzquierdo.SetActive(false);
     }
 
     public void Dosmando()
     {
-        dosMandos = true;
+        mandoIzquierdo.SetActive(true);
     }
 
     public void Contador()
@@ -73,7 +75,7 @@ public class GameManager : MonoBehaviour
                 mensajeFinalText.text = "¡Has ganado!";
 
             if (spawner == null)
-                BuscarSpawner();
+                BuscarSpawneryUi();
 
             if (spawner != null)
                 spawner.StopSpawning();
@@ -98,7 +100,7 @@ public class GameManager : MonoBehaviour
             mensajeFinalText.text = "";
 
         ActualizarUI();
-        BuscarSpawner();
+        BuscarSpawneryUi();
 
         if (spawner != null)
             spawner.StartSpawning();
@@ -110,8 +112,10 @@ public class GameManager : MonoBehaviour
             puntosText.text = puntosActuales + " / " + objetivoPuntos;
     }
 
-    private void BuscarSpawner()
+    private void BuscarSpawneryUi()
     {
         spawner = FindAnyObjectByType<ProySpawner>();
+        Ui = FindAnyObjectByType<MenuManager>();
+        if (Ui == null) { return; }
     }
 }

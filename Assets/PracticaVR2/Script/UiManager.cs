@@ -5,31 +5,55 @@ using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
+    public static MenuManager Instance;
+
     [Header("UI")]
     [SerializeField] private TMP_Dropdown selectorObjetivo;
-    [SerializeField] private Toggle unMandoToggle;
-    [SerializeField] private Toggle dosMandosToggle;
+    [SerializeField] private Toggle unMando;
+    [SerializeField] private Toggle dosMandos;
+
+    private Scene escenaActual;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     private void Start()
     {
-        if (selectorObjetivo != null)
-            selectorObjetivo.value = 1;
+        if (escenaActual.name == "vrsMenu")
+        {
+            Debug.Log("entra?");
+            if (selectorObjetivo != null)
+                selectorObjetivo.value = 1;
 
-        if (dosMandosToggle != null)
-            dosMandosToggle.isOn = true;
-
-        if (unMandoToggle != null)
-            unMandoToggle.isOn = false;
+            if (dosMandos != null)
+                dosMandos.isOn = true;
+            if (unMando != null)
+                unMando.isOn = false;
+        }
+        else { return; }
 
         AplicarConfiguracion();
+    }
+
+    private void Update()
+    {
     }
 
     public void ElegirUnMando(bool valor)
     {
         if (!valor) return;
 
-        if (dosMandosToggle != null)
-            dosMandosToggle.SetIsOnWithoutNotify(false);
+        if (dosMandos != null)
+            dosMandos.SetIsOnWithoutNotify(false);
 
         if (GameManager.Instance != null)
             GameManager.Instance.Unmando();
@@ -39,8 +63,8 @@ public class MenuManager : MonoBehaviour
     {
         if (!valor) return;
 
-        if (unMandoToggle != null)
-            unMandoToggle.SetIsOnWithoutNotify(false);
+        if (unMando != null)
+            unMando.SetIsOnWithoutNotify(false);
 
         if (GameManager.Instance != null)
             GameManager.Instance.Dosmando();
@@ -52,10 +76,19 @@ public class MenuManager : MonoBehaviour
 
         GameManager.Instance.SetObjetivo(ObtenerObjetivoDesdeDropdown());
 
-        if (dosMandosToggle != null && dosMandosToggle.isOn)
+        ///
+        if (dosMandos != null && dosMandos.isOn)
+        {
+            unMando.isOn = false;
+            //Debug.Log("entra");
             GameManager.Instance.Dosmando();
-        else
+        }
+        else if (unMando != null && unMando.isOn)
+        { 
+            dosMandos.isOn = false;
+            //Debug.Log("entra2");
             GameManager.Instance.Unmando();
+        }
     }
 
     public void IrAFacil()

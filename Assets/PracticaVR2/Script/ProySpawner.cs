@@ -81,6 +81,13 @@ public class ProySpawner : MonoBehaviour
 
     private Vector3 GetSpawnPosition()
     {
+        if (player == null)
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj == null) return Vector3.zero;
+            player = playerObj.transform;
+        }
+
         Vector3 playerForward = player.forward;
         playerForward.y = 0f;
         playerForward.Normalize();
