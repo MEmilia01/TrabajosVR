@@ -1,21 +1,24 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class ProySpawner : MonoBehaviour
 {
-    [SerializeField] public GameObject Cubo;
-    [SerializeField] public GameObject Bomba;
+    [SerializeField] private GameObject Cubo;
+    [SerializeField] private GameObject Bomba;
     [SerializeField] private Transform player;
-    [SerializeField] public float Distancia = 10f;
-    [SerializeField] public float bombaPro = 0.3f;
+    [SerializeField] private float Distancia = 10f;
+    [SerializeField] private float bombaPro = 0.3f;
     [SerializeField] private float AngCubo = 90f;
-    [SerializeField] float tiempoSpawn = 4f;
-    Scene escenaActual;
-    void Start()
+    [SerializeField] private float tiempoSpawn = 4f;
+
+    private Scene escenaActual;
+    private Coroutine spawnCoroutine;
+    private bool spawning;
+
+    private void Start()
     {
-        StartCoroutine(SpawnLoop());
+        StartSpawning();
     }
 
     private void Update()
@@ -23,38 +26,60 @@ public class ProySpawner : MonoBehaviour
         escenaActual = SceneManager.GetActiveScene();
     }
 
-    IEnumerator SpawnLoop()
+    public void StartSpawning()
     {
-        while (true)
-        {
-            yield return new WaitForSeconds(tiempoSpawn);
+        if (spawning) return;
 
-            if (escenaActual.name == "vrsMenu") {  }
-            else if (escenaActual.name == "vrsDificil")
-            {
-                if (Random.value <= bombaPro) { SpawnBomba(); }
-                else { SpawnCubo(); }
-            }
-            else { SpawnCubo(); } 
-        }
+        spawning = true;
+        spawnCoroutine = StartCoroutine(SpawnLoop());
     }
 
     public void StopSpawning()
     {
-        StopCoroutine(SpawnLoop());
+        spawning = false;
+
+        if (spawnCoroutine != null)
+        {
+            StopCoroutine(spawnCoroutine);
+            spawnCoroutine = null;
+        }
     }
 
-    void SpawnCubo()
+    private IEnumerator SpawnLoop()
+    {
+        while (spawning)
+        {
+            yield return new WaitForSeconds(tiempoSpawn);
+
+            if (escenaActual.name == "vrsMenu")
+            {
+                continue;
+            }
+            else if (escenaActual.name == "vrsDificil")
+            {
+                if (Random.value <= bombaPro)
+                    SpawnBomba();
+                else
+                    SpawnCubo();
+            }
+            else
+            {
+                SpawnCubo();
+            }
+        }
+    }
+
+    private void SpawnCubo()
     {
         Instantiate(Cubo, GetSpawnPosition(), Quaternion.identity);
     }
 
-    void SpawnBomba()
+    private void SpawnBomba()
     {
         Instantiate(Bomba, GetSpawnPosition(), Quaternion.identity);
     }
 
-    Vector3 GetSpawnPosition()
+    private Vector3 GetSpawnPosition()
     {
         Vector3 playerForward = player.forward;
         playerForward.y = 0f;

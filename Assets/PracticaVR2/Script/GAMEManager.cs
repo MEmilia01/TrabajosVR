@@ -1,72 +1,117 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [SerializeField] private TextMeshProUGUI Puntos;
-    [SerializeField] private GameObject mandoIzq;
-    [SerializeField] private TextMeshProUGUI Uipuntos;
-    [SerializeField] private Slider numerosfinal;
-    [SerializeField] private bool dosmandos;
-    [SerializeField] private int fin = 20;
+    [Header("UI Juego")]
+    [SerializeField] private TextMeshProUGUI puntosText;
+    [SerializeField] private TextMeshProUGUI mensajeFinalText;
+    [SerializeField] private GameObject mandoIzquierdo;
 
-    private int puntosconseguidos = 0;
-    private Scene escenaActual;
+    [Header("Configuración")]
+    [SerializeField] private int objetivoPuntos = 20;
+    [SerializeField] private bool dosMandos = true;
 
-    void Awake()
+    private int puntosActuales = 0;
+    private ProySpawner spawner;
+
+    public int ObjetivoPuntos => objetivoPuntos;
+    public int PuntosActuales => puntosActuales;
+    public bool DosMandos => dosMandos;
+
+    private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
-        escenaActual = SceneManager.GetActiveScene();
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void Start()
+    {
+        BuscarSpawner();
+        ActualizarUI();
     }
 
     private void Update()
     {
-        if (numerosfinal != null) numerosfinal.value = puntosconseguidos;
-        if (Uipuntos != null) Uipuntos.text = puntosconseguidos + " / " + fin;
-
-        if (mandoIzq != null) mandoIzq.SetActive(dosmandos);
+        if (mandoIzquierdo != null)
+            mandoIzquierdo.SetActive(!dosMandos);
     }
 
     public void SetObjetivo(int nuevoObjetivo)
     {
-        fin = nuevoObjetivo;
+        objetivoPuntos = Mathf.Max(1, nuevoObjetivo);
+        ActualizarUI();
+    }
+
+    public void Unmando()
+    {
+        dosMandos = false;
+    }
+
+    public void Dosmando()
+    {
+        dosMandos = true;
     }
 
     public void Contador()
     {
-        puntosconseguidos++;
-        ActualizarTexto();
+        puntosActuales++;
+        ActualizarUI();
 
-        if (puntosconseguidos >= fin)
+        if (puntosActuales >= objetivoPuntos)
         {
-            if (Puntos != null) Puntos.text = "¡Has ganadoooo!";
+            if (mensajeFinalText != null)
+                mensajeFinalText.text = "¡Has ganado!";
 
-            var spawner = FindAnyObjectByType<ProySpawner>();
-            if (spawner != null) spawner.StopSpawning();
+            if (spawner == null)
+                BuscarSpawner();
+
+            if (spawner != null)
+                spawner.StopSpawning();
         }
     }
 
     public void Descontador()
     {
-        puntosconseguidos--;
-        ActualizarTexto();
+        puntosActuales = Mathf.Max(0, puntosActuales - 1);
+        ActualizarUI();
     }
 
-    private void ActualizarTexto()
+    public bool MetaAlcanzada()
     {
-        if (Puntos != null)
-            Puntos.text = puntosconseguidos + " / " + fin;
+        return puntosActuales >= objetivoPuntos;
     }
 
-    public void Unmando() { dosmandos = false; }
-    public void Dosmando() { dosmandos = true; }
+    public void ReiniciarPartida()
+    {
+        puntosActuales = 0;
+        if (mensajeFinalText != null)
+            mensajeFinalText.text = "";
 
-    public void IrFacil() { SceneManager.LoadScene("vrsFacil"); }
-    public void IrDificil() { SceneManager.LoadScene("vrsDificil"); }
+        ActualizarUI();
+        BuscarSpawner();
 
-    public bool MetaAlcanzada() => puntosconseguidos >= fin;
+        if (spawner != null)
+            spawner.StartSpawning();
+    }
+
+    private void ActualizarUI()
+    {
+        if (puntosText != null)
+            puntosText.text = puntosActuales + " / " + objetivoPuntos;
+    }
+
+    private void BuscarSpawner()
+    {
+        spawner = FindAnyObjectByType<ProySpawner>();
+    }
 }

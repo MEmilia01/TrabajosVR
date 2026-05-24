@@ -6,60 +6,53 @@ using UnityEngine.UI;
 public class MenuManager : MonoBehaviour
 {
     [Header("UI")]
-    [SerializeField] private TMP_Dropdown selectorObjetivo;   // 1 cubos, 2 cubos, etc.
-    [SerializeField] private Toggle unMandoToggle;            // true = un mando
-    [SerializeField] private Toggle dosMandosToggle;          // true = dos mandos
-
-    [Header("Opciones")]
-    [SerializeField] private int objetivoInicial = 20;
+    [SerializeField] private TMP_Dropdown selectorObjetivo;
+    [SerializeField] private Toggle unMandoToggle;
+    [SerializeField] private Toggle dosMandosToggle;
 
     private void Start()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.Dosmando();
-        }
-
         if (selectorObjetivo != null)
-        {
-            selectorObjetivo.value = 0;
-        }
+            selectorObjetivo.value = 1;
 
-        if (unMandoToggle != null && dosMandosToggle != null)
-        {
-            unMandoToggle.isOn = false;
+        if (dosMandosToggle != null)
             dosMandosToggle.isOn = true;
-        }
+
+        if (unMandoToggle != null)
+            unMandoToggle.isOn = false;
 
         AplicarConfiguracion();
+    }
+
+    public void ElegirUnMando(bool valor)
+    {
+        if (!valor) return;
+
+        if (dosMandosToggle != null)
+            dosMandosToggle.SetIsOnWithoutNotify(false);
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.Unmando();
+    }
+
+    public void ElegirDosMandos(bool valor)
+    {
+        if (!valor) return;
+
+        if (unMandoToggle != null)
+            unMandoToggle.SetIsOnWithoutNotify(false);
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.Dosmando();
     }
 
     public void AplicarConfiguracion()
     {
         if (GameManager.Instance == null) return;
 
-        int objetivo = objetivoInicial;
+        GameManager.Instance.SetObjetivo(ObtenerObjetivoDesdeDropdown());
 
-        if (selectorObjetivo != null)
-        {
-            switch (selectorObjetivo.value)
-            {
-                case 0: objetivo = 10; break;
-                case 1: objetivo = 20; break;
-                case 2: objetivo = 30; break;
-                default: objetivo = objetivoInicial; break;
-            }
-        }
-
-        GameManager.Instance.SetObjetivo(objetivo);
-
-        bool dosMandos = true;
-        if (unMandoToggle != null && dosMandosToggle != null)
-        {
-            dosMandos = dosMandosToggle.isOn;
-        }
-
-        if (dosMandos)
+        if (dosMandosToggle != null && dosMandosToggle.isOn)
             GameManager.Instance.Dosmando();
         else
             GameManager.Instance.Unmando();
@@ -77,15 +70,17 @@ public class MenuManager : MonoBehaviour
         SceneManager.LoadScene("vrsDificil");
     }
 
-    public void SeleccionarUnMando()
+    private int ObtenerObjetivoDesdeDropdown()
     {
-        if (GameManager.Instance != null)
-            GameManager.Instance.Unmando();
-    }
+        if (selectorObjetivo == null)
+            return 20;
 
-    public void SeleccionarDosMandos()
-    {
-        if (GameManager.Instance != null)
-            GameManager.Instance.Dosmando();
+        switch (selectorObjetivo.value)
+        {
+            case 0: return 10;
+            case 1: return 20;
+            case 2: return 30;
+            default: return 20;
+        }
     }
 }
